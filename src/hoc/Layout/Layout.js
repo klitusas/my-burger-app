@@ -11,11 +11,19 @@ class Layout extends Component {
     sideDrawerClosedHandler = () => {
         this.setState({ showSideDrawer: false })
     }
+    /**
+     * Need to update our component’s state using the current state of the component.
+     * Directly accessing this.state to update our component is not a reliable way 
+     * to update our component’s next state.
+     * Thats why susing function expression
+     * 'showSideDrawer: !prevState.showSideDrawer' especially in these cases
+     */
     sideDrawerToggleHandler = () => {
+        
         this.setState((prevState) => {
             return { showSideDrawer: !prevState.showSideDrawer }
         })
-    }
+    } 
     render() {
         return (
             <Aux>
