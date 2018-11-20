@@ -9,6 +9,8 @@ const withErrorHAndler = (WrappedComponent, axios) => {
         }
 
         /**
+         * THIS IS A HIGHER ORDER FUNCTION WHICH WRAPS THE COMPONENT
+         * 
          * Used to be componentDidMount but it is called 
          * after all child component sare rendered. So 
          * componentDidMount will only be called once component 

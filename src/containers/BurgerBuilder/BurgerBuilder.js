@@ -68,7 +68,7 @@ class BurgerBuilder extends Component {
         if (oldCount <= 0) {
             return;
         }
-        const updatedCount = oldCount - 1;
+        const updatedCount = oldCount - 1; 
         const updatedIngredients = {
             ...this.state.ingredients
         };
@@ -90,30 +90,27 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        // alert("You continue!");
-        this.setState({ loading: true })
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice.toFixed(2),
-            customer: {
-                name: 'Andrejus SOlovjovas',
-                address: {
-                    street: 'Teststreet 1',
-                    zipCode: '41351',
-                    country: 'Germany'
-                },
-                emai: 'test@test.com',
-            },
-            deliveryMethod: 'fastest'
+   
+        const queryParams = [];
+        let ingredients = {
+            bacon: 1, 
+            cheese: 2,
+            salad: 1
         }
-
-        axios.post('/orders.json', order)
-            .then(response => {
-                this.setState({ loading: false, purchasing: false })
-            })
-            .catch(error => {
-                this.setState({ loading: false, purchasing: false })
-            })
+        for(let i in this.state.ingredients){
+            /**
+             * encodeURIComponent encodes the element in such way 
+             * that it can be used as in the url,
+             * this is relevant for fixing white spaces and so on
+             */
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+        queryParams.push('price=' + this.state.totalPrice)
+        const queryString = queryParams.join('&');
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + queryString,
+        });
     }
 
     render() {
