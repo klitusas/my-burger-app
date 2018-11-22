@@ -4,8 +4,15 @@ import classes from './ContactData.module.css';
 import axios from '../../../axios-orders';
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input';
-
+import { connect } from 'react-redux';
 class ContactData extends Component {
+
+    /**
+     * NOT REDUX: 
+     * Local UI state, we dont need the information 
+     * about  our form anywhere in application;
+     * However we use 'ingredients' here
+    */
     state = {
         orderForm: {
             name: {
@@ -15,7 +22,7 @@ class ContactData extends Component {
                     placeholder: 'Your name'
                 },
                 value: '',
-                validation : {
+                validation: {
                     required: true
                 },
                 valid: false,
@@ -30,7 +37,7 @@ class ContactData extends Component {
                     placeholder: 'Street'
                 },
                 value: '',
-                validation : {
+                validation: {
                     required: true
                 },
                 valid: false,
@@ -43,7 +50,7 @@ class ContactData extends Component {
                     placeholder: 'ZIP Code'
                 },
                 value: '',
-                validation : {
+                validation: {
                     required: true,
                     minLengh: 5,
                     maxLength: 5
@@ -58,7 +65,7 @@ class ContactData extends Component {
                     placeholder: 'Country'
                 },
                 value: '',
-                validation : {
+                validation: {
                     required: true
                 },
                 valid: false,
@@ -71,7 +78,7 @@ class ContactData extends Component {
                     placeholder: 'Your e-mail'
                 },
                 value: '',
-                validation : {
+                validation: {
                     required: true
                 },
                 valid: false,
@@ -91,7 +98,7 @@ class ContactData extends Component {
                 valid: true
             }
         },
-        formIsValid : false,
+        formIsValid: false,
         loading: false
     }
 
@@ -103,7 +110,7 @@ class ContactData extends Component {
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
         }
         const order = {
-            ingredients: this.props.ingredients,
+            ingredients: this.props.ings,
             price: this.props.price,
             formData: formData
         }
@@ -125,21 +132,21 @@ class ContactData extends Component {
             })
     }
 
-    checkValidity(value, rules){
-        let isValid = true;     
+    checkValidity(value, rules) {
+        let isValid = true;
         /** 
          * we check one if after the other
          * this means that only the last isValid
          * will be considered for return -> we fixed it by 
          * adding '&& isValid';
         */
-        if(rules.required){
+        if (rules.required) {
             isValid = value.trim() !== '' && isValid;
         }
-        if(rules.minLengh){
+        if (rules.minLengh) {
             isValid = value.length >= rules.minLengh && isValid;;
         }
-        if(rules.maxLengh){
+        if (rules.maxLengh) {
             isValid = value.length <= rules.maxLengh && isValid;;
         }
         return isValid;
@@ -167,7 +174,7 @@ class ContactData extends Component {
 
         let formIsValid = true;
 
-        for(let inputIdentifier in updatedOrderForm ) {
+        for (let inputIdentifier in updatedOrderForm) {
             formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid;
         }
 
@@ -210,4 +217,11 @@ class ContactData extends Component {
     }
 }
 
-export default ContactData;
+const mapStateToProps = (state) => {
+    return {
+        ings: state.ingredients,
+        price: state.totalPrice
+    }
+}
+
+export default connect(mapStateToProps)(ContactData);

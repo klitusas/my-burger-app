@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-
+import { Provider } from 'react-redux';
+import {createStore} from 'redux';
+import reducer from './store/reducer';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
@@ -10,10 +12,21 @@ import * as serviceWorker from './serviceWorker';
 this is a good place to wrap everything (culd be as well App.js) */
 
 
+/**
+ * PLEASE SEE THE TUTORIAL ON LAZY LOADING IMPLEMENTATION
+ * USING THE HIGHER ORDER FUNCTION, PROMISE
+ */
+
+ const store = createStore(reducer);
+
+
 const app = (
-    <BrowserRouter>
-        <App/>
-    </BrowserRouter>
+    /* connect the store with redux with our app */
+    <Provider store={store}>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </Provider>
 );
 
 
