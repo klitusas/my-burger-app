@@ -9,7 +9,7 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrdersSummary';
 import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner'
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
-import * as actionTypes from '../../store/actions';
+import * as actions from '../../store/actions/index';
 
 
 class BurgerBuilder extends Component {
@@ -32,13 +32,17 @@ class BurgerBuilder extends Component {
          * Probably best to handle locally with 'state'
          * */
         purchasing: false,
-        loading: false,
-        error: false
+        //moved to actions burgerBuilder.js
+        // loading: false,
+        // error: false
     }
     /**
      *Good place to fetch 
      */
     componentDidMount() {
+        /** 
+         * REDUX: is handled now by redux-thunk
+        */
         // axios.get('https://react-burger-builder-1ecfe.firebaseio.com/ingredients.json')
         //     .then(res => {
         //         this.setState({ ingredients: res.data })
@@ -46,6 +50,7 @@ class BurgerBuilder extends Component {
         //     .catch(error => {
         //         this.setState({error: true})
         //     })
+        this.props.onInitIngredients();
     }
 
     updatePurchaseState(ingredients) {
@@ -102,7 +107,7 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-
+        this.props.onInitPurchase();
         // const queryParams = [];
         // let ingredients = {
         //     bacon: 1,
@@ -133,7 +138,12 @@ class BurgerBuilder extends Component {
             disabledInfo[key] = disabledInfo[key] <= 0; //sets true or false
         }
         let orderSummary = null;
-        let burger = this.state.error ? <p>Ingredients cannot be loaded</p> : <Spinner />;
+        /** 
+         * We will have to handle this this.state.error as
+         * a REDUX state because we moved out axios
+         * where it was set
+        */
+        let burger = this.props.error ? <p>Ingredients cannot be loaded</p> : <Spinner />;
         if (this.props.ings) {
             burger = (
                 <Aux>
@@ -152,10 +162,10 @@ class BurgerBuilder extends Component {
                 purchaseContinued={this.purchaseContinueHandler}
                 price={this.props.price} />;
         }
-        if (this.state.loading) {
-            orderSummary = <Spinner />
-        }
-
+        //removed because of REDUX
+        // if (this.state.loading) {
+        //     orderSummary = <Spinner />
+        // }
         return (
             <Aux>
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
@@ -169,16 +179,23 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = state => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        error: state.burgerBuilder.error
     }
 }
-
+ 
 const mapDispatchToProps = dispatch => {
     return {
-        onIngredientAdded: (ingName) => dispatch({type: actionTypes.ADD_INGREDIENT, ingredientName: ingName}),
-        onIngredientRemoved: (ingName) => dispatch({type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName})
+        onIngredientAdded: (ingName) => dispatch(actions.addIngredient(ingName)),
+        onIngredientRemoved: (ingName) => dispatch(actions.removeIngredient(ingName)),
+        onInitIngredients: () => dispatch(actions.initIngredients()),
+        onInitPurchase: () => dispatch(actions.purchaseInit())
     }
 }
 
+/** 
+ * we still can use withErrorHandler despite the fact that we
+ * make a request from the actions because we are using the axios instance
+*/
 export default connect(mapStateToProps, mapDispatchToProps) (withErrorHandler(BurgerBuilder, axios));

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import CheckoutSummary from '../../components/Order/CheckoutSummary';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-
+import * as actions from '../../store/actions/index';
 import ContactData from './ContactData/ContactData';
 class Checkout extends Component {
     /*  IMPORTANT: REMOVED BY REDUX */
@@ -34,6 +34,15 @@ class Checkout extends Component {
     //         this.setState({ingredients: ingredients, totalPrice: price})
     //     }
 
+    /**
+     *  IMPORTANT: componentWillMount was too late
+     * therefore we could not dispatch in here. Instead we moved
+     * everything to the BurgerBuilder
+     */
+    // componentWillMount() {
+    //     this.props.onInitPurchase();
+    // }
+
     checkoutCancelled = () => {
         /* history api */
         console.log("back")
@@ -45,42 +54,71 @@ class Checkout extends Component {
     }
 
     render() {
-        return (
-            <div>
-                {/* Will use routing to really pass ingredients */}
-                <CheckoutSummary
+        {/* Redirecting user: because if nothing is chosen
+                there is no point being in the checkout CheckoutSummary */}
+        let summary = <Redirect to="/" />
+        if (this.props.ings) {
+            const purchasedRedirect = this.props.purchased ? <Redirect to="/" /> : null
+            summary = (
+                <div>
+                    {purchasedRedirect}
+                    <CheckoutSummary
+                        ingredients={this.props.ings}
+                        onCheckoutCancelled={this.checkoutCancelled}
+                        onCheckoutContinued={this.checkoutContinued} />
+                    <Route
+                        path={this.props.match.path + '/contact-data'}
+                        component={ContactData} />
+                </div>
+
+            )
+        }
+        return summary;
+
+        {/* Will use routing to really pass ingredients */ }
+        {/* <CheckoutSummary
                     ingredients={this.props.ings}
                     onCheckoutCancelled={this.checkoutCancelled}
-                    onCheckoutContinued={this.checkoutContinued} />
+                    onCheckoutContinued={this.checkoutContinued} /> */}
 
-                {/* to pass data to a component through route, example:
+        {/* to pass data to a component through route, example:
                 <Route
                     path='{this.props.match.path + '/contact-data'}'
                     render={(props) => <ContactData {...props} isAuthed={true} />}
                 /> */}
 
-                {/* IMPORTANT: REPLACED BY REDUX */}
-                {/* <Route path={this.props.match.path + '/contact-data'} render={(props) => (<ContactData
+        {/* IMPORTANT: REPLACED BY REDUX */ }
+        {/* <Route path={this.props.match.path + '/contact-data'} render={(props) => (<ContactData
                     ingredients={this.props.ings}
                     price={this.props.price}
                     {...props} />)} /> {
-                        /* sending props to get history */} 
+                        /* sending props to get history */}
 
 
-                {/* Will have to connect in ContactData */}
-                <Route 
+        {/* Will have to connect in ContactData */ }
+        {/* <Route 
                     path={this.props.match.path + '/contact-data'}
-                    component={ContactData} />
-            </div>
-        )
+                    component={ContactData} /> */}
+
+
     }
 }
 
 const mapStateToProps = state => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        purchased: state.order.purchased
     }
 }
 
+/**
+ *  IMPORTANT: componentWillMount was too late
+ * therefore we could not dispatch in here. Instead we moved
+ * everything to the BurgerBuilder
+ */
+// const mapDispatchToProp = dispatch => {
+//     return {
+//         onInitPurchase: () => dispatch(actions.purchaseInit())
+//     }
+// }
 export default connect(mapStateToProps)(Checkout);
