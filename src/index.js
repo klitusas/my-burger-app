@@ -9,7 +9,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import thunk from 'redux-thunk'; //middleware
 import orderReducer from './store/reducers/order'
-
+import authReducer from './store/reducers/auth'
 /* Wrap everything in the router component,
 this is a good place to wrap everything (culd be as well App.js) */
 
@@ -19,6 +19,7 @@ this is a good place to wrap everything (culd be as well App.js) */
  * USING THE HIGHER ORDER FUNCTION, PROMISE
  */
 
+ 
 const logger = store => {
     return next => {
         return action => {
@@ -36,10 +37,12 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 //combining reducers
 const rootReducer = combineReducers({
     burgerBuilder: burgerBuilderReducer,
-    order: orderReducer
-})
+    order: orderReducer,
+    auth: authReducer
+});
+
 const store = createStore(rootReducer, composeEnhancers(
-    applyMiddleware(thunk, logger)
+    applyMiddleware(thunk)//, logger)
 ));
 
 const app = (
@@ -50,7 +53,6 @@ const app = (
         </BrowserRouter>
     </Provider>
 );
-
 
 ReactDOM.render(app, document.getElementById('root'));
 
